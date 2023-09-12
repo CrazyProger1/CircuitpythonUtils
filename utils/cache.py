@@ -1,4 +1,9 @@
+"""Circuitpython cache implementations."""
+
+
 def cache(func):
+    """Cache decorator implementation."""
+
     result_cache = {}
 
     def wrapper(*args, **kwargs):
@@ -15,5 +20,3 @@ def cache(func):
         return result
 
     return wrapper
-
-
