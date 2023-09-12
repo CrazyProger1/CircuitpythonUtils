@@ -1,5 +1,5 @@
-from buc.utils.cache import cache
-from buc.utils.exceptions import ValidationError
+from utils.cache import cache
+from utils.exceptions import ValidationError
 
 
 class Field:
