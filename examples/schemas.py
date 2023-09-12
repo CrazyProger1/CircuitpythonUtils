@@ -12,6 +12,7 @@ class User(Schema):
     email = Field(str, nullable=True)
 
     role = Field(Role)
+    test: int
 
 
 user = User.model_validate({
@@ -21,7 +22,8 @@ user = User.model_validate({
     'email': 'admin@example.com',
     'role': {
         'name': 'admin'
-    }
+    },
+    'test': 1
 })
 print(user)  # User<username=testuser password=simplepassword age=18 email=admin@example.com role=Role<name=admin>>
 
@@ -42,7 +44,8 @@ user = User.model_validate({
     'email': 'admin@example.com',
     'role': {
         'name': 'admin'
-    }
+    },
+    'test': 10
 })
 
 # utils.exceptions.ValidationError: Field age of schema User must be type of <class 'int'>, not <class 'str'>

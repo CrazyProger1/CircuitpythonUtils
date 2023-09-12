@@ -13,6 +13,14 @@ class Field:
 
 class Schema:
     def __init__(self, **data):
+        cls = self.__class__
+
+        annotations = cls.__dict__.get('__annotations__')
+
+        if annotations:
+            for field, ant in annotations.items():
+                setattr(cls, field, Field(ant))
+
         for field, field_type in self.get_fields().items():
             value = data.get(field, field_type.default)
 

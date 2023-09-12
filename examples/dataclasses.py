@@ -7,7 +7,7 @@ class TestDataclass:
 
 
 test = TestDataclass(name='hello')
-print(test)
+print(test)  # TestDataclass<name=hello>
 
 test2 = TestDataclass()
 # utils.exceptions.ValidationError: Field name of schema TestDataclass can't be null
