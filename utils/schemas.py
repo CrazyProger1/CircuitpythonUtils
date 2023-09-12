@@ -19,7 +19,12 @@ class Schema:
 
         if annotations:
             for field, ant in annotations.items():
-                setattr(cls, field, Field(ant))
+                default_val = getattr(self, field, None)
+
+                if isinstance(default_val, Field):
+                    continue
+
+                setattr(cls, field, Field(ant, default=default_val, nullable=default_val is not None))
 
         for field, field_type in self.get_fields().items():
             value = data.get(field, field_type.default)

@@ -9,14 +9,17 @@ class Value:
         self.enum_name = enum_name
 
     def __eq__(self, other):
-        return self.value == other
+        if isinstance(other, self.datatype):
+            return self.value == other
+        elif isinstance(other, Value):
+            return self is other
 
     def __str__(self):
         return f'<{self.enum_name}.{self.name}: {self.value}>'
 
 
 class Enum:
-    fields: dict
+    pass
 
 
 def enum(cls):
@@ -30,14 +33,30 @@ def enum(cls):
 
     attrs = {}
 
+    values = set()
+
     for field, value in cls.__dict__.items():
-        print(field, value)
         if isinstance(value, datatype):
+            values.add(value)
             attrs.update({field: Value(
                 value=value,
                 name=field,
                 enum_name=cls.__name__)
             })
 
+    if datatype is int:
+        annotations = cls.__dict__.get('__annotations__')
+        if annotations:
+            max_val = max(values)
+
+            for field, ant in annotations.items():
+
+                if field not in attrs and ant is int:
+                    max_val += 1
+                    attrs.update({field: Value(
+                        value=max_val,
+                        name=field,
+                        enum_name=cls.__name__)
+                    })
     new_cls = type(cls.__name__, (Enum,), attrs)
     return new_cls
