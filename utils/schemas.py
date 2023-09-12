@@ -5,17 +5,31 @@ from utils.exceptions import ValidationError
 
 
 class Field:
-    def __init__(self, datatype: type, default=None, nullable=False):
+    def __init__(self, datatype: type, default=None, nullable: bool = False):
         self.datatype = datatype
         self.default = default
         self.nullable = nullable
 
 
 class Schema:
+    def __init__(self, **data):
+        for field, field_type in self.get_fields().items():
+            value = data.get(field, field_type.default)
+
+            self.validate_field(
+                name=field,
+                field_type=field_type,
+                value=value
+            )
+
+            if issubclass(field_type.datatype, Schema) and isinstance(value, dict):
+                value = field_type.datatype.model_validate(value)
+
+            setattr(self, field, value)
 
     @classmethod
     @cache
-    def fields(cls) -> dict:
+    def get_fields(cls) -> dict:
         result = {}
 
         for name, value in cls.__dict__.items():
@@ -39,7 +53,7 @@ class Schema:
 
     @classmethod
     def validate(cls, obj: dict):
-        for field, field_type in cls.fields().items():
+        for field, field_type in cls.get_fields().items():
             value = obj.get(field, field_type.default)
             cls.validate_field(field, field_type, value)
 
@@ -47,7 +61,7 @@ class Schema:
 
         result = {}
 
-        for field, field_type in self.fields().items():
+        for field, field_type in self.get_fields().items():
             value = getattr(self, field, field_type.default)
 
             self.validate_field(
@@ -65,23 +79,7 @@ class Schema:
 
     @classmethod
     def model_validate(cls, obj: dict) -> "Schema":
-
-        instance = cls()
-
-        for field, field_type in cls.fields().items():
-            value = obj.get(field, field_type.default)
-
-            cls.validate_field(
-                name=field,
-                field_type=field_type,
-                value=value
-            )
-
-            if issubclass(field_type.datatype, Schema) and isinstance(value, dict):
-                value = field_type.datatype.model_validate(value)
-
-            setattr(instance, field, value)
-
+        instance = cls(**obj)
         return instance
 
     def __str__(self):
