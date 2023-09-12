@@ -2,24 +2,28 @@ from utils.cache import cache
 
 
 class TestClass:
-    pass
+    def __init__(self, arg=1):
+        pass
 
 
 class TestClass2:
     pass
 
 
-class Singleton:
-    @cache
-    def __new__(cls, *args, **kwargs):
-        return super(Singleton, cls).__new__(cls, *args, **kwargs)
-
-
 @cache
-def get_single_instance(cls, *args, **kwargs):
+def get_instance(cls, *args, **kwargs):
     return cls(*args, **kwargs)
 
 
-print(get_single_instance(TestClass) is get_single_instance(TestClass))  # True
-print(get_single_instance(TestClass) is get_single_instance(TestClass2))  # False
-print(Singleton() is Singleton())  # True
+@cache
+def func():
+    print('Call')
+
+
+print(get_instance(TestClass) is get_instance(TestClass))  # True
+print(get_instance(TestClass) is get_instance(TestClass2))  # False
+print(get_instance(TestClass, 2) is get_instance(TestClass))  # False
+print(get_instance(TestClass, 3) is get_instance(TestClass, 3))  # True
+
+func()  # Call
+func()  # Nothing
