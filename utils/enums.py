@@ -20,6 +20,9 @@ class Value:
     def __str__(self):
         return f'<{self.enum_name}.{self.name}: {self.value}>'
 
+    def __int__(self):
+        return int(self.value)
+
     def __repr__(self):
         return str(self)
 
@@ -47,32 +50,42 @@ def enum(cls):
     attrs = {}
 
     values = set()
+    field_to_ignore = {'__dict__', }
+    int_values = set()
 
     for field, value in cls.__dict__.items():
+        if field in field_to_ignore:
+            continue
+
         if isinstance(value, datatype):
-            values.add(value)
-            attrs.update({field: Value(
+            int_values.add(value)
+            val = Value(
                 value=value,
                 name=field,
                 enum_name=cls.__name__)
-            })
+
+            attrs.update({field: val})
+            values.add(val)
+        else:
+            attrs.update({field: value})
 
     if datatype is int:
         annotations = cls.__dict__.get('__annotations__')
         if annotations:
-            max_val = max(values)
+            max_val = max(int_values)
 
             for field, ant in annotations.items():
 
                 if field not in attrs and ant is int:
                     max_val += 1
-                    attrs.update({field: Value(
+                    val = Value(
                         value=max_val,
                         name=field,
                         enum_name=cls.__name__)
-                    })
+                    attrs.update({field: val})
+                    values.add(val)
 
-    attrs.update({'values': frozenset(attrs.values())})
+    attrs.update({'values': frozenset(values)})
 
     new_cls = type(cls.__name__, (Enum,), attrs)
     return new_cls

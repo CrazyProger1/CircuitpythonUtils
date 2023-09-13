@@ -16,6 +16,10 @@ class TestEnum2(int):
     C = 3
     D: int
 
+    @classmethod
+    def get_d(cls):
+        return cls.D
+
 
 d = TestEnum.D
 
@@ -40,3 +44,5 @@ print(TestEnum.B.name)  # B
 print(TestEnum.B.value)  # 2
 
 print(TestEnum2.B in TestEnum.values)  # False
+
+print(TestEnum2.get_d())  # <TestEnum2.D: 4>
