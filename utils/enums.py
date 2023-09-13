@@ -14,12 +14,25 @@ class Value:
         elif isinstance(other, Value):
             return self is other
 
+    def __hash__(self):
+        return hash(self.value)
+
     def __str__(self):
         return f'<{self.enum_name}.{self.name}: {self.value}>'
 
+    def __repr__(self):
+        return str(self)
+
 
 class Enum:
-    pass
+    values: frozenset
+
+    def __new__(cls, *args, **kwargs):
+        args_len = len(args)
+        if args_len == 1:
+            arg = args[0]
+
+            return getattr(cls, arg, None)
 
 
 def enum(cls):
@@ -58,5 +71,8 @@ def enum(cls):
                         name=field,
                         enum_name=cls.__name__)
                     })
+
+    attrs.update({'values': frozenset(attrs.values())})
+
     new_cls = type(cls.__name__, (Enum,), attrs)
     return new_cls

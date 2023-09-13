@@ -7,11 +7,6 @@ def test(*args, **kwargs):
     return dict({1: 1})
 
 
-@cache.cache
-def test2():
-    pass
-
-
 class TestCache(unittest.TestCase):
     def test_cache_decorator(self):
         self.assertIs(test(), test())
