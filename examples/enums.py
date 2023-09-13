@@ -38,3 +38,5 @@ print(3 in TestEnum.values)  # True
 
 print(TestEnum.B.name)  # B
 print(TestEnum.B.value)  # 2
+
+print(TestEnum2.B in TestEnum.values)  # False
