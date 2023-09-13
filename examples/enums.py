@@ -1,16 +1,16 @@
 from utils.enums import enum
 
 
-@enum
-class TestEnum(int):
+@enum(int)
+class TestEnum:
     A = 1
     B = 2
     C = 3
     D: int
 
 
-@enum
-class TestEnum2(int):
+@enum(int)
+class TestEnum2:
     A = 1
     B = 2
     C = 3

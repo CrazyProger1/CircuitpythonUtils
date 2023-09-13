@@ -2,30 +2,30 @@ import unittest
 from utils import enums
 
 
-@enums.enum
-class TestIntEnum(int):
+@enums.enum(int)
+class TestIntEnum:
     A: int
     B: int = 1
     C: int = 2
     D: int
 
 
-@enums.enum
-class TestIntEnum2(int):
+@enums.enum(int)
+class TestIntEnum2:
     A: int
     B: int = 1
     C: int = 2
     D: int
 
 
-@enums.enum
-class TestStringEnum(str):
+@enums.enum(str)
+class TestStringEnum:
     a = 'abc'
     b = 'cba'
 
 
-@enums.enum
-class TestStringEnum2(str):
+@enums.enum(str)
+class TestStringEnum2:
     a = 'abc'
     b = 'cba'
 

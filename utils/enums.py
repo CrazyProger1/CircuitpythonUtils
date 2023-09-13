@@ -38,54 +38,62 @@ class Enum:
             return getattr(cls, arg, None)
 
 
-def enum(cls):
-    mro = cls.mro()
-    datatype = mro[1]
+def enum(datatype: type = int):
+    if not issubclass(datatype, (str, int)):
+        raise TypeError(f'Enum only supports int or str')
 
-    if datatype is object:
-        datatype = int
-    elif not issubclass(datatype, (str, int)):
-        raise TypeError(f'Enum must inherit int or str, not {datatype}')
+    def decorator(cls):
+        nonlocal datatype
 
-    attrs = {}
+        attrs = {}
 
-    values = set()
-    field_to_ignore = {'__dict__', }
-    int_values = set()
+        values = set()
+        field_to_ignore = {'__dict__', }
+        int_values = set()
 
-    for field, value in cls.__dict__.items():
-        if field in field_to_ignore:
-            continue
+        for field, value in cls.__dict__.items():
+            if field in field_to_ignore:
+                continue
 
-        if isinstance(value, datatype):
-            int_values.add(value)
-            val = Value(
-                value=value,
-                name=field,
-                enum_name=cls.__name__)
+            if isinstance(value, datatype):
+                int_values.add(value)
+                val = Value(
+                    value=value,
+                    name=field,
+                    enum_name=cls.__name__)
 
-            attrs.update({field: val})
-            values.add(val)
-        else:
-            attrs.update({field: value})
+                attrs.update({field: val})
+                values.add(val)
+            else:
+                attrs.update({field: value})
 
-    if datatype is int:
-        annotations = cls.__dict__.get('__annotations__')
-        if annotations:
-            max_val = max(int_values)
+        if datatype is int:
+            annotations = cls.__dict__.get('__annotations__')
+            if annotations:
+                max_val = max(int_values)
 
-            for field, ant in annotations.items():
+                for field, ant in annotations.items():
 
-                if field not in attrs and ant is int:
-                    max_val += 1
-                    val = Value(
-                        value=max_val,
-                        name=field,
-                        enum_name=cls.__name__)
-                    attrs.update({field: val})
-                    values.add(val)
+                    if field not in attrs and ant is int:
+                        max_val += 1
+                        val = Value(
+                            value=max_val,
+                            name=field,
+                            enum_name=cls.__name__)
+                        attrs.update({field: val})
+                        values.add(val)
 
-    attrs.update({'values': frozenset(values)})
+        attrs.update({'values': frozenset(values)})
 
-    new_cls = type(cls.__name__, (Enum,), attrs)
-    return new_cls
+        new_cls = type(cls.__name__, (Enum,), attrs)
+        return new_cls
+
+    return decorator
+
+
+def int_enum(func):
+    return enum(int)(func)
+
+
+def str_enum(func):
+    return enum(str)(func)
